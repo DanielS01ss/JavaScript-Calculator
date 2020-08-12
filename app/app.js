@@ -40,12 +40,13 @@ function expressionProcessor() {
     ///vom pleca de la cea mai simpla procesare
    
     ///luam primele doua numere
-   
+    let displayContent = true;
+
 if(displayedExpression)
 {
     let parsedString = [];
     let num = '';
-
+    // debugger;
     for (const elem of displayedExpression) {
         if (isCharNumber(elem) || elem === '.') {
             num += elem;
@@ -115,6 +116,60 @@ if(displayedExpression)
 
     }
 
+    if (parsedString.includes("÷")) {
+        let firstNum;
+        let secondNum;
+        let funcResult;
+        ///prima data facem inmultirile
+        for (let i = 0; i < parsedString.length; i++) {
+            if (parsedString[i] === "÷") {
+                firstNum = parsedString[i - 1];
+                secondNum = parsedString[i + 1];
+                if(secondNum === "+")
+                {
+                    secondNum = parsedString[i+2];
+                    if(secondNum!=="0")
+                    {
+                        funcResult = firstNum / secondNum;
+                        
+                        parsedString.splice(i - 1, 4, funcResult);
+                    }
+                    else{
+                        displayedExpression = displayedExpression.slice(0,displayedExpression.length-1);
+                        alert("You can't divide by 0 boss");
+                        displayContent = false;
+                        firstInput.textContent = displayedExpression;
+                    }
+                    
+                }
+
+                else{
+                    if(secondNum!=0)
+                    {
+                        funcResult = firstNum / secondNum;
+                        parsedString.splice(i - 1, 3, funcResult);
+                    }
+                    else{
+                        displayedExpression = displayedExpression.slice(0,displayedExpression.length-1);
+                        displayContent = false;
+                        alert("You can't divide by 0 boss");
+                        firstInput.textContent = displayedExpression;
+                        
+                    }
+                    
+                }
+
+
+            }
+
+        }   
+        ///verificam daca mai sunt itemuri in string daca nu punem la result direct
+        if (parsedString.length === 1) {
+            result = parsedString[0];
+        }
+
+    }
+
     ///iteram stringul
     ///prima data verificam sa aiba minim 3 elemente
     ///ultimul element sa fie numar daca nu il eliminam
@@ -149,12 +204,22 @@ if(displayedExpression)
     }
 
     ///punem pe pagina rezultatul
-    lastInput.textContent = displayedExpression + "=";
-    firstInput.textContent = result;
-    displayedExpression = result;
 
-    result = null;
-    wasResult = true;
+    if(displayContent)
+    {   
+        let stringResult = result.toString();
+        ///infrumusetam resultul
+        if(stringResult.split(".")[1] && stringResult.split(".")[1].length>3)
+        {
+            result = result.toFixed(2);
+        }
+        lastInput.textContent = displayedExpression + "=";
+        firstInput.textContent = result;
+        displayedExpression = result;
+        result = null;
+        wasResult = true;
+    }
+    
 }
    else{
        alert("Don't you think that you should provide some numbers??");
