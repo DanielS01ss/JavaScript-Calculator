@@ -26,7 +26,8 @@ let itIsNum = false;
 let wasResult = false;
 let notDisplayed = false;
 let minusAlert = false;
-let point = false;
+let point = true;
+let num = false;
 ///aceasta functie este apelata in momentul in care butonul de egal este apasat
 ///ea prelucreaza expresia asa cum trebuie
 
@@ -64,7 +65,7 @@ if(displayedExpression)
     }
 
     if (parsedString.length < 3) {
-        result = parseInt(parsedString[0]);
+        result = parseFloat(parsedString[0]);
     }
 
 
@@ -106,7 +107,7 @@ if(displayedExpression)
 
             }
 
-        }
+        }   
         ///verificam daca mai sunt itemuri in string daca nu punem la result direct
         if (parsedString.length === 1) {
             result = parsedString[0];
@@ -125,7 +126,7 @@ if(displayedExpression)
 
 
     if (parsedString.length >= 3 && !result && (parsedString.includes("+") || parsedString.includes("-"))) {
-        result = parseInt(parsedString[0]);
+        result = parseFloat(parsedString[0]);
         ///plecam cu iteratul de la 1
         for (let i = 1; i < parsedString.length; i++) {
             ///acuma ne apucam si ce facem este sa 
@@ -139,9 +140,9 @@ if(displayedExpression)
             }
             else {
                 if (sign === "+")
-                    result += parseInt(parsedString[i]);
+                    result += parseFloat(parsedString[i]);
                 if (sign === "-")
-                    result -= parseInt(parsedString[i]);
+                    result -= parseFloat(parsedString[i]);
             }
         }
 
@@ -164,22 +165,47 @@ if(displayedExpression)
 ///functia asta ce face este ca adauga expresia pe ecran
 function handleExpreesion(evt) {
     let display = true;
+   
+  
+    if(!isCharNumber(evt.target.textContent) && !isNum && evt.target.textContent === "-")
+    {
+        displayedExpression += evt.target.textContent;
+        firstInput.textContent = displayedExpression;
+        isNum = true;
 
-    if (!isCharNumber(evt.target.textContent) && !isNum) {
+    }
+    else if (!isCharNumber(evt.target.textContent) && !isNum) {
         alert("First input must be number!!");
         display = false;
+        isNum = true;
+
     }
     else
         isNum = true;
      
-    
-    if(evt.target.textContent === "-" && "x÷".includes(displayedExpression[displayedExpression.length-1]))
+    ///trebuie sa si manipulam cazul in care userul vrea sa introduca 03 spre exemplu
+    if( !"0+.x-÷".includes(evt.target.textContent) && displayedExpression[displayedExpression.length-1]==="0" && ("+-x÷".includes(displayedExpression[displayedExpression.length-2]) || displayedExpression.length===1))
     {
-        point = true;
+         alert("I didn't knew that numbers start with 0 =))");
+         display = false;
     }
-    else if("+-÷x".includes(displayedExpression[displayedExpression.length-1]))
+
+    ///putem adauga punct numai daca suntem intr-un  numar asa ca verificam ultimul element din displayedExpression
+    if(isCharNumber(displayedExpression[displayedExpression.length-1]) && evt.target.textContent === "." && point === true) 
+    {
+        point = false;
+        displayedExpression += evt.target.textContent;
+        firstInput.textContent = displayedExpression;
+
+       
+    }
+    else if("+-x÷".includes(displayedExpression[displayedExpression.length-1]))
     {
         point = true;
+    }   
+    if(point === false && evt.target.textContent === ".")
+    {   
+        display = false;
     }
     
     
@@ -232,12 +258,12 @@ function handleExpreesion(evt) {
     else if ("+x÷-".includes(displayedExpression[displayedExpression.length - 1]) && displayedExpression[displayedExpression.length - 2] === "-") {
         display = false;
     }
-    
-    if (display) {
+
+    else if (display) {
         displayedExpression += evt.target.textContent;
         firstInput.textContent = displayedExpression;
     }
-    if(displayedExpression.length>15)
+    if(displayedExpression.length>25)
     {
         alert("Prea mare expresia!!!!!!");
         displayedExpression = '';
